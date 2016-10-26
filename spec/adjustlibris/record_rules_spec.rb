@@ -16,6 +16,7 @@ describe "AdjustLibris::RecordRules" do
 
       it "should not touch 041$a when it already exists" do
         new_record = AdjustLibris::RecordRules.rule_041(@record_with_041)
+        expect(new_record.fields("041").count).to eq(@record_with_041.fields("041").count)
         expect(new_record["041"]).to be_kind_of(MARC::DataField)
         expect(new_record["041"]["a"]).to eq(@record_with_041["041"]["a"])
       end
