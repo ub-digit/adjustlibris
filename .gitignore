@@ -1,3 +1,9 @@
 *~
 \#*#
 .#*
+
+# Ignore spec/temp
+spec/temp/*
+
+# But keep this file
+!spec/temp/.gitkeep
