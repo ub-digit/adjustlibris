@@ -25,7 +25,7 @@ class AdjustLibris
       record
     end
 
-    # Remove any '-' from any 020a and 020z
+    # Remove any '-' from any 020$a and 020$z
     def self.rule_020(record)
       record = clone(record)
       record.fields('020').each do |field|
@@ -39,6 +39,35 @@ class AdjustLibris
             subfield.value = subfield.value.gsub(/-/,'')
           end
         end
+      end
+      record
+    end
+
+    # Deduplicate 030 on $a
+    def self.rule_030(record)
+      record = clone(record)
+
+      found_a_fields = []
+      idx_to_remove = []
+
+      # Parse through fields, ignoring anything not 030.
+      # Store all indexes to remove
+      record.fields.each.with_index do |field,idx|
+        next if field.tag != "030"
+        if field['a']
+          if found_a_fields.include?(field['a'])
+            idx_to_remove << idx
+            next
+          else
+            found_a_fields << field['a']
+          end
+        end
+      end
+
+      # Remove all indexes in reverse order (highest first)
+      # so that index numbering isn't thrown off
+      idx_to_remove.reverse.each do |idx|
+        record.remove(idx)
       end
       record
     end

@@ -45,5 +45,32 @@ describe "AdjustLibris::RecordRules" do
         expect(new_record["020"]["a"]).to eq("9339344444444")
       end
     end
+
+    context "rule_030" do
+      before :each do
+        @record_030 = MARC::Reader.new("spec/data/rule_030.mrc").first
+      end
+      
+      it "should deduplicate 030 based on $a" do
+        new_record = AdjustLibris::RecordRules.rule_030(@record_030)
+        fields = new_record.fields('030')
+        expect(fields.count).to eq(5)
+        expect(fields[0]).to be_kind_of(MARC::DataField)
+        expect(fields[0]['a']).to eq("CODEN1") 
+        expect(fields[0]['z']).to be_nil
+        expect(fields[1]).to be_kind_of(MARC::DataField)
+        expect(fields[1]['z']).to eq("CODENINVAL") 
+        expect(fields[1]['a']).to be_nil
+        expect(fields[2]).to be_kind_of(MARC::DataField)
+        expect(fields[2]['z']).to eq("CODENINVAL2") 
+        expect(fields[2]['a']).to be_nil
+        expect(fields[3]).to be_kind_of(MARC::DataField)
+        expect(fields[3]['a']).to eq("CODEN2")
+        expect(fields[3]['z']).to eq("CODENINVAL") 
+        expect(fields[4]).to be_kind_of(MARC::DataField)
+        expect(fields[4]['a']).to eq("CODEN3")
+        expect(fields[4]['z']).to eq("CODENINVAL")
+      end
+    end
   end
 end
