@@ -67,7 +67,7 @@ class AdjustLibris
       # Remove all indexes in reverse order (highest first)
       # so that index numbering isn't thrown off
       idx_to_remove.reverse.each do |idx|
-        record.remove(idx)
+        record.remove_at(idx)
       end
       record
     end

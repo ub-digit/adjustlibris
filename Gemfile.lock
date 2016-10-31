@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/ub-digit/ruby-marc.git
-  revision: 647af5b72cfe815848884a433a470dc34d37e0b2
+  revision: ba2636d88ba853f685013a488a344f09a8c251ba
   branch: remove_field_or_subfield
   specs:
     marc (1.0.1)
