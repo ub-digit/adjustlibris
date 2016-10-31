@@ -26,5 +26,24 @@ describe "AdjustLibris::RecordRules" do
         expect(new_record["041"]).to_not be_kind_of(MARC::DataField)
       end
     end
+
+    context "rule_020" do
+      before :each do
+        @record_020z_with_dash = MARC::Reader.new("spec/data/rule_020-z_with_dash.mrc").first
+        @record_020a_with_dash = MARC::Reader.new("spec/data/rule_020-a_with_dash.mrc").first
+      end
+      
+      it "should remove all dashes from 020$z" do
+        new_record = AdjustLibris::RecordRules.rule_020(@record_020z_with_dash)
+        expect(new_record["020"]).to be_kind_of(MARC::DataField)
+        expect(new_record["020"]["z"]).to eq("9339344444444")
+      end
+
+      it "should remove all dashes from 020$a" do
+        new_record = AdjustLibris::RecordRules.rule_020(@record_020a_with_dash)
+        expect(new_record["020"]).to be_kind_of(MARC::DataField)
+        expect(new_record["020"]["a"]).to eq("9339344444444")
+      end
+    end
   end
 end

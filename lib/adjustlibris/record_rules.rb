@@ -24,5 +24,23 @@ class AdjustLibris
       end
       record
     end
+
+    # Remove any '-' from any 020a and 020z
+    def self.rule_020(record)
+      record = clone(record)
+      record.fields('020').each do |field|
+        sub_a = field.find_all { |subfield| subfield.code == 'a'}
+        sub_z = field.find_all { |subfield| subfield.code == 'z'}
+
+        subs = sub_a + sub_z
+        
+        if subs
+          subs.each do |subfield|
+            subfield.value = subfield.value.gsub(/-/,'')
+          end
+        end
+      end
+      record
+    end
   end
 end

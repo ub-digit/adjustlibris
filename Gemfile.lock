@@ -1,10 +1,16 @@
+GIT
+  remote: https://github.com/ub-digit/ruby-marc.git
+  revision: ac807470caa83a31f956713d6253e1339d7721b4
+  branch: remove_field_or_subfield
+  specs:
+    marc (1.0.1)
+      scrub_rb (>= 1.0.1, < 2)
+      unf
+
 GEM
   remote: https://rubygems.org/
   specs:
     diff-lcs (1.2.5)
-    marc (1.0.0)
-      scrub_rb (>= 1.0.1, < 2)
-      unf
     rake (10.4.2)
     rspec (3.5.0)
       rspec-core (~> 3.5.0)
@@ -28,7 +34,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  marc
+  marc!
   rake
   rspec
 
