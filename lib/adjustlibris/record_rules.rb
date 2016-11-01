@@ -10,6 +10,7 @@ class AdjustLibris
       record = rule_084_5_2(record)
       record = rule_084_kssb(record)
       record = rule_084_5_not2(record)
+      record = rule_084_to_089(record)
       record
     end
 
@@ -171,6 +172,17 @@ class AdjustLibris
         if field['5'] != "Ge"
           record.remove(field)
         end
+      end
+      record
+    end
+
+    # 084 without $2 or where $2 does not start with kssb, convert to 089
+    def self.rule_084_to_089(record)
+      record = clone(record)
+      record.fields('084').each do |field|
+        next if field['2'] && field['2'][/^kssb/]
+        record.append(MARC::DataField.new('089', field.indicator1, field.indicator2, *field.subfields))
+        record.remove(field)
       end
       record
     end

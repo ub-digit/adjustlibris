@@ -107,6 +107,7 @@ describe "AdjustLibris::RecordRules" do
         @record_084_without_sub5_2 = MARC::Reader.new("spec/data/rule_084-without_sub5_2.mrc").first
         @record_084_with_multiple_kssb = MARC::Reader.new("spec/data/rule_084-with_multiple_kssb.mrc").first
         @record_084_with_sub5_not2 = MARC::Reader.new("spec/data/rule_084-with_sub5_not2.mrc").first
+        @record_084_with_sub5_not2_to_089 = MARC::Reader.new("spec/data/rule_084-with_sub5_not2_to_089.mrc").first
       end
 
       it "should remove field if no $5 or $2 is present" do
@@ -139,6 +140,22 @@ describe "AdjustLibris::RecordRules" do
         expect(fields[1]).to be_kind_of(MARC::DataField)
         expect(fields[1]['a']).to eq("F:other") 
         expect(fields[1]['5']).to eq("Ge")
+      end
+
+      it "should convert field to 089 if $2 is not present or if $2 does not start with kssb" do
+        new_record = AdjustLibris::RecordRules.rule_084_to_089(@record_084_with_sub5_not2_to_089)
+
+        fields = new_record.fields('084')
+        expect(fields.count).to eq(1)
+        expect(fields[0]).to be_kind_of(MARC::DataField)
+        expect(fields[0]['a']).to eq("F:do") 
+        expect(fields[0]['2']).to_not be_nil
+
+        fields = new_record.fields('089')
+        expect(fields.count).to eq(1)
+        expect(fields[0]).to be_kind_of(MARC::DataField)
+        expect(fields[0]['a']).to eq("F:other") 
+        expect(fields[0]['5']).to eq("Ge")
       end
     end      
   end
