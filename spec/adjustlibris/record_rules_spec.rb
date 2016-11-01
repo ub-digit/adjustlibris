@@ -101,5 +101,16 @@ describe "AdjustLibris::RecordRules" do
         expect(new_record['035']).to be_nil
       end
     end
+
+    context "rule_084" do
+      before :each do
+        @record_084_without_sub5_2 = MARC::Reader.new("spec/data/rule_084-without_sub5_2.mrc").first
+      end
+
+      it "should remove field if no $5 or $2 is present" do
+        new_record = AdjustLibris::RecordRules.rule_084_5_2(@record_084_without_sub5_2)
+        expect(new_record['084']).to be_nil
+      end
+    end      
   end
 end

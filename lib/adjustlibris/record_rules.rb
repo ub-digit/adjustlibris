@@ -6,6 +6,8 @@ class AdjustLibris
       record = rule_020(record)
       record = rule_035_9(record)
       record = rule_035_9_to_a(record)
+      record = rule_035_5(record)
+      record = rule_084_5_2(record)
       record
     end
 
@@ -106,6 +108,16 @@ class AdjustLibris
         if field['5']
           record.remove(field)
         end
+      end
+      record
+    end
+
+    # Remove all 084 where neither $5 nor $2 exists.
+    def self.rule_084_5_2(record)
+      record = clone(record)
+      record.fields('084').each do |field|
+        next if field['5'] || field['2']
+        record.remove(field)
       end
       record
     end
