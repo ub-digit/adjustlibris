@@ -158,5 +158,34 @@ describe "AdjustLibris::RecordRules" do
         expect(fields[0]['5']).to eq("Ge")
       end
     end      
+
+    context "rule_130" do
+      before :each do
+        @record_130_s = MARC::Reader.new("spec/data/rule_130-leader_s.mrc").first
+        @record_130_not_s = MARC::Reader.new("spec/data/rule_130-leader_not_s.mrc").first
+      end
+
+      it "should convert to 222 if LEADER7 is s" do
+        new_record = AdjustLibris::RecordRules.rule_130(@record_130_s)
+        expect(new_record['130']).to be_nil
+        expect(new_record['222']['a']).to eq("Title with - in its name")
+      end
+
+      it "should not convert to 222 if LEADER7 is other than s" do
+        new_record = AdjustLibris::RecordRules.rule_130(@record_130_not_s)
+        expect(new_record['222']).to be_nil
+        expect(new_record['130']['a']).to eq("Title with - in its name")
+      end
+    end
+
+    context "rule_222" do
+      before :each do
+        @record_222 = MARC::Reader.new("spec/data/rule_222.mrc").first
+      end
+      it "should replace _-_ with _/_ if present in $a" do
+        new_record = AdjustLibris::RecordRules.rule_222(@record_222)
+        expect(new_record['222']['a']).to eq("Title with / in its name")
+      end
+    end
   end
 end

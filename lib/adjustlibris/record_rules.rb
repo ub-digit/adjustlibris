@@ -11,6 +11,8 @@ class AdjustLibris
       record = rule_084_kssb(record)
       record = rule_084_5_not2(record)
       record = rule_084_to_089(record)
+      record = rule_130(record)
+      record = rule_222(record)
       record
     end
 
@@ -186,5 +188,28 @@ class AdjustLibris
       end
       record
     end
-  end
+
+    # If LEADER7 is s and 130 exists, convert it to 222
+    def self.rule_130(record)
+      record = clone(record)
+      if record.leader[7] == "s"
+        field = record['130']
+        if field
+          record.append(MARC::DataField.new('222', field.indicator1, field.indicator2, *field.subfields))
+          record.remove(field)
+        end
+      end
+      record
+    end
+    
+    # If 222$a contains ' - ', replace it with ' / '
+    def self.rule_222(record)
+      record = clone(record)
+      if record['222'] && record['222']['a'] && record['222']['a'][/ - /]
+        subfield = record['222'].subfields.find_all { |sf| sf.code == 'a'}.first
+        subfield.value = record['222']['a'].gsub(/ - /, ' / ')
+      end
+      record
+    end
+ end
 end
