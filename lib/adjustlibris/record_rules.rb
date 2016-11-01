@@ -9,6 +9,7 @@ class AdjustLibris
       record = rule_035_5(record)
       record = rule_084_5_2(record)
       record = rule_084_kssb(record)
+      record = rule_084_5_not2(record)
       record
     end
 
@@ -158,6 +159,18 @@ class AdjustLibris
       # so that index numbering isn't thrown off
       idx_to_remove.reverse.each do |idx|
         record.remove_at(idx)
+      end
+      record
+    end
+
+    # 084 with $5 and not $2, remove unless $5 contains Ge
+    def self.rule_084_5_not2(record)
+      record = clone(record)
+      record.fields('084').each do |field|
+        next if !field['5'] || field['2']
+        if field['5'] != "Ge"
+          record.remove(field)
+        end
       end
       record
     end

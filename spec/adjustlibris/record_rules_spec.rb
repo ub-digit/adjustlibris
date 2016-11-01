@@ -106,6 +106,7 @@ describe "AdjustLibris::RecordRules" do
       before :each do
         @record_084_without_sub5_2 = MARC::Reader.new("spec/data/rule_084-without_sub5_2.mrc").first
         @record_084_with_multiple_kssb = MARC::Reader.new("spec/data/rule_084-with_multiple_kssb.mrc").first
+        @record_084_with_sub5_not2 = MARC::Reader.new("spec/data/rule_084-with_sub5_not2.mrc").first
       end
 
       it "should remove field if no $5 or $2 is present" do
@@ -126,6 +127,18 @@ describe "AdjustLibris::RecordRules" do
         expect(fields[2]).to be_kind_of(MARC::DataField)
         expect(fields[2]['a']).to eq("F:other") 
         expect(fields[2]['2']).to eq("not same")
+      end
+
+      it "should remove field if $5 is present, but not $2 except if $5 contains Ge" do
+        new_record = AdjustLibris::RecordRules.rule_084_5_not2(@record_084_with_sub5_not2)
+        fields = new_record.fields('084')
+        expect(fields.count).to eq(2)
+        expect(fields[0]).to be_kind_of(MARC::DataField)
+        expect(fields[0]['a']).to eq("F:do") 
+        expect(fields[0]['5']).to be_nil
+        expect(fields[1]).to be_kind_of(MARC::DataField)
+        expect(fields[1]['a']).to eq("F:other") 
+        expect(fields[1]['5']).to eq("Ge")
       end
     end      
   end
