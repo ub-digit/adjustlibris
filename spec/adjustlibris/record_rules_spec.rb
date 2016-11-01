@@ -72,5 +72,28 @@ describe "AdjustLibris::RecordRules" do
         expect(fields[4]['z']).to eq("CODENINVAL")
       end
     end
+
+    context "rule_035" do
+      before :each do
+        @record_035_with_sub9_8chars = MARC::Reader.new("spec/data/rule_035-with_sub9_8chars.mrc").first
+        @record_035_with_sub9_not_8chars = MARC::Reader.new("spec/data/rule_035-with_sub9_not_8chars.mrc").first
+      end
+
+      it "should insert a dash in 035$9 if length is exactly 8 (issn)" do
+        new_record = AdjustLibris::RecordRules.rule_035_9(@record_035_with_sub9_8chars)
+        expect(new_record['035']['9']).to eq("1111-2345")
+      end
+      
+      it "should not insert a dash in 035$9 if length is other than 8 (issn)" do
+        new_record = AdjustLibris::RecordRules.rule_035_9(@record_035_with_sub9_not_8chars)
+        expect(new_record['035']['9']).to eq("991234567")
+      end
+      
+      it "should move 035$9 to 035$a" do
+        new_record = AdjustLibris::RecordRules.rule_035_9_to_a(@record_035_with_sub9_not_8chars)
+        expect(new_record['035']['9']).to be_nil
+        expect(new_record['035']['a']).to eq("991234567")
+      end
+    end
   end
 end

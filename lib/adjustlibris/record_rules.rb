@@ -3,6 +3,9 @@ class AdjustLibris
     # Apply in turn each and every rule, and return a record in the end.
     def self.apply(record)
       record = rule_041(record)
+      record = rule_020(record)
+      record = rule_035_9(record)
+      record = rule_035_9_to_a(record)
       record
     end
 
@@ -68,6 +71,30 @@ class AdjustLibris
       # so that index numbering isn't thrown off
       idx_to_remove.reverse.each do |idx|
         record.remove_at(idx)
+      end
+      record
+    end
+
+    # If 035$9 contains exactly 8 characters, insert a dash in the middle.
+    def self.rule_035_9(record)
+      record = clone(record)
+      record.fields('035').each do |field|
+        next if !field['9']
+        if field['9'].size == 8
+          subfield = field.subfields.find_all { |sf| sf.code == '9' }.first
+          subfield.value = field['9'][0..3] + '-' + field['9'][4..7]
+        end
+      end
+      record
+    end
+
+    # If 035$9 exists, move it to 035$a.
+    def self.rule_035_9_to_a(record)
+      record = clone(record)
+      record.fields('035').each do |field|
+        next if !field['9']
+        field.append(MARC::Subfield.new('a', field['9']))
+        field.remove('9')
       end
       record
     end
