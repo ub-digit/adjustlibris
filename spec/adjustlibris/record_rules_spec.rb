@@ -77,6 +77,7 @@ describe "AdjustLibris::RecordRules" do
       before :each do
         @record_035_with_sub9_8chars = MARC::Reader.new("spec/data/rule_035-with_sub9_8chars.mrc").first
         @record_035_with_sub9_not_8chars = MARC::Reader.new("spec/data/rule_035-with_sub9_not_8chars.mrc").first
+        @record_035_with_sub5 = MARC::Reader.new("spec/data/rule_035-with_sub5.mrc").first
       end
 
       it "should insert a dash in 035$9 if length is exactly 8 (issn)" do
@@ -93,6 +94,11 @@ describe "AdjustLibris::RecordRules" do
         new_record = AdjustLibris::RecordRules.rule_035_9_to_a(@record_035_with_sub9_not_8chars)
         expect(new_record['035']['9']).to be_nil
         expect(new_record['035']['a']).to eq("991234567")
+      end
+
+      it "should remove a 035 field if it has a $5" do
+        new_record = AdjustLibris::RecordRules.rule_035_5(@record_035_with_sub5)
+        expect(new_record['035']).to be_nil
       end
     end
   end

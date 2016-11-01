@@ -98,5 +98,16 @@ class AdjustLibris
       end
       record
     end
+
+    # If 035$5 exists, remove the entire 035 field.
+    def self.rule_035_5(record)
+      record = clone(record)
+      record.fields('035').each do |field|
+        if field['5']
+          record.remove(field)
+        end
+      end
+      record
+    end
   end
 end
