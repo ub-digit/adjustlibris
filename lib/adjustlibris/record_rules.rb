@@ -13,6 +13,8 @@ class AdjustLibris
       record = rule_084_to_089(record)
       record = rule_130(record)
       record = rule_222(record)
+      record = rule_599_ind1(record)
+      record = rule_599_remove(record)
       record
     end
 
@@ -211,5 +213,29 @@ class AdjustLibris
       end
       record
     end
- end
+
+    # If 599 ind1 and ind2 are blank, and LEADER is s, set ind1 to 1
+    def self.rule_599_ind1(record)
+      record = clone(record)
+      if record.leader[7] == "s"
+        record.fields('599').each do |field|
+          if field.indicator1 == " " && field.indicator2 == " "
+            field.indicator1 = "1"
+          end
+        end
+      end
+      record
+    end
+
+    # If 599 ind1 and ind2 are blank, remove the field
+    def self.rule_599_remove(record)
+      record = clone(record)
+      record.fields('599').each do |field|
+        if field.indicator1 == " " && field.indicator2 == " "
+          record.remove(field)
+        end
+      end
+      record
+    end
+  end
 end

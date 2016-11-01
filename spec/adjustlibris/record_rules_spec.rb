@@ -182,9 +182,44 @@ describe "AdjustLibris::RecordRules" do
       before :each do
         @record_222 = MARC::Reader.new("spec/data/rule_222.mrc").first
       end
+
       it "should replace _-_ with _/_ if present in $a" do
         new_record = AdjustLibris::RecordRules.rule_222(@record_222)
         expect(new_record['222']['a']).to eq("Title with / in its name")
+      end
+    end
+
+    context "rule_599" do
+      before :each do
+        @record_599_s = MARC::Reader.new("spec/data/rule_599-s.mrc").first
+        @record_599_not_s = MARC::Reader.new("spec/data/rule_599-not_s.mrc").first
+        @record_599_not_blank = MARC::Reader.new("spec/data/rule_599-not_blank.mrc").first
+      end
+
+      it "should change ind1 to 1 if ind1 and ind2 are blank and LEADER7 is s" do
+        new_record = AdjustLibris::RecordRules.rule_599_ind1(@record_599_s)
+        fields = new_record.fields('599')
+        expect(fields[0].indicator1).to eq("1")
+        expect(fields[0].indicator2).to eq(" ")
+      end
+
+      it "should not change ind1 if LEADER7 is other than s" do
+        new_record = AdjustLibris::RecordRules.rule_599_ind1(@record_599_not_s)
+        fields = new_record.fields('599')
+        expect(fields[0].indicator1).to eq(" ")
+        expect(fields[0].indicator2).to eq(" ")
+      end
+
+      it "should remove 599 where ind1 and ind2 are both blank" do
+        new_record = AdjustLibris::RecordRules.rule_599_remove(@record_599_not_s)
+        fields = new_record.fields('599')
+        expect(fields.count).to eq(0)
+      end
+
+      it "should not remove 599 when ind1 or ind2 are set" do
+        new_record = AdjustLibris::RecordRules.rule_599_remove(@record_599_not_blank)
+        fields = new_record.fields('599')
+        expect(fields.count).to eq(1)
       end
     end
   end
