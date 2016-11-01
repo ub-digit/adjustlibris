@@ -8,6 +8,7 @@ class AdjustLibris
       record = rule_035_9_to_a(record)
       record = rule_035_5(record)
       record = rule_084_5_2(record)
+      record = rule_084_kssb(record)
       record
     end
 
@@ -118,6 +119,45 @@ class AdjustLibris
       record.fields('084').each do |field|
         next if field['5'] || field['2']
         record.remove(field)
+      end
+      record
+    end
+
+    # Deduplicate 084 on $a when $2 starts with kssb.
+    def self.rule_084_kssb(record)
+      record = clone(record)
+
+      found_a_fields = []
+      highest_kssb_for_a = {}
+      idx_to_remove = []
+
+      # Parse through fields, ignoring anything not 030.
+      # Store all indexes to remove
+      record.fields.each.with_index do |field,idx|
+        next if field.tag != "084"
+        if field['a'] && field['2'][/^kssb/]
+          if found_a_fields.include?(field['a'])
+            # If the current field has a lower kssb-value than a previously stored field,
+            # mark this one for removal, otherwise remove the previously stored field,
+            # and set this as the current highest.
+            if field['2'] <= highest_kssb_for_a[field['a']][:value]
+              idx_to_remove << idx
+            else
+              idx_to_remove << highest_kssb_for_a[field['a']][:idx]
+              highest_kssb_for_a[field['a']] = {idx: idx, value: field['2']}
+            end
+            next
+          else
+            found_a_fields << field['a']
+            highest_kssb_for_a[field['a']] = {idx: idx, value: field['2']}
+          end
+        end
+      end
+
+      # Remove all indexes in reverse order (highest first)
+      # so that index numbering isn't thrown off
+      idx_to_remove.reverse.each do |idx|
+        record.remove_at(idx)
       end
       record
     end

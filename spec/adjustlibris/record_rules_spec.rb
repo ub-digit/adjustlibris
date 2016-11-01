@@ -105,11 +105,27 @@ describe "AdjustLibris::RecordRules" do
     context "rule_084" do
       before :each do
         @record_084_without_sub5_2 = MARC::Reader.new("spec/data/rule_084-without_sub5_2.mrc").first
+        @record_084_with_multiple_kssb = MARC::Reader.new("spec/data/rule_084-with_multiple_kssb.mrc").first
       end
 
       it "should remove field if no $5 or $2 is present" do
         new_record = AdjustLibris::RecordRules.rule_084_5_2(@record_084_without_sub5_2)
         expect(new_record['084']).to be_nil
+      end
+
+      it "should deduplicate 084 based on $a when $2 starts with kssb" do
+        new_record = AdjustLibris::RecordRules.rule_084_kssb(@record_084_with_multiple_kssb)
+        fields = new_record.fields('084')
+        expect(fields.count).to eq(3)
+        expect(fields[0]).to be_kind_of(MARC::DataField)
+        expect(fields[0]['a']).to eq("F:do") 
+        expect(fields[0]['2']).to eq("kssb/8 (machine generated)")
+        expect(fields[1]).to be_kind_of(MARC::DataField)
+        expect(fields[1]['a']).to eq("F:fno") 
+        expect(fields[1]['2']).to eq("kssb/9")
+        expect(fields[2]).to be_kind_of(MARC::DataField)
+        expect(fields[2]['a']).to eq("F:other") 
+        expect(fields[2]['2']).to eq("not same")
       end
     end      
   end
