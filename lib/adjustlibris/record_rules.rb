@@ -15,6 +15,8 @@ class AdjustLibris
       record = rule_222(record)
       record = rule_599_ind1(record)
       record = rule_599_remove(record)
+      record = rule_440(record)
+      record = rule_830(record)
       record
     end
 
@@ -207,10 +209,7 @@ class AdjustLibris
     # If 222$a contains ' - ', replace it with ' / '
     def self.rule_222(record)
       record = clone(record)
-      if record['222'] && record['222']['a'] && record['222']['a'][/ - /]
-        subfield = record['222'].subfields.find_all { |sf| sf.code == 'a'}.first
-        subfield.value = record['222']['a'].gsub(/ - /, ' / ')
-      end
+      record = replace_dashed_separator(record, '222', 'a')
       record
     end
 
@@ -234,6 +233,28 @@ class AdjustLibris
         if field.indicator1 == " " && field.indicator2 == " "
           record.remove(field)
         end
+      end
+      record
+    end
+
+    # If 440$a contains ' - ', replace it with ' / '
+    def self.rule_440(record)
+      record = clone(record)
+      record = replace_dashed_separator(record, '440', 'a')
+      record
+    end
+
+    # If 830$a contains ' - ', replace it with ' / '
+    def self.rule_830(record)
+      record = clone(record)
+      record = replace_dashed_separator(record, '830', 'a')
+      record
+    end
+
+    def self.replace_dashed_separator(record, tag, subfield_code = 'a')
+      if record[tag] && record[tag][subfield_code] && record[tag][subfield_code][/ - /]
+        subfield = record[tag].subfields.find_all { |sf| sf.code == subfield_code}.first
+        subfield.value = record[tag][subfield_code].gsub(/ - /, ' / ')
       end
       record
     end

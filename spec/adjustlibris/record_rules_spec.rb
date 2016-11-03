@@ -222,5 +222,27 @@ describe "AdjustLibris::RecordRules" do
         expect(fields.count).to eq(1)
       end
     end
+
+    context "rule_440" do
+      before :each do
+        @record_440 = MARC::Reader.new("spec/data/rule_440.mrc").first
+      end
+
+      it "should replace _-_ with _/_ if present in $a" do
+        new_record = AdjustLibris::RecordRules.rule_440(@record_440)
+        expect(new_record['440']['a']).to eq("Title with / in its name")
+      end
+    end
+
+    context "rule_830" do
+      before :each do
+        @record_830 = MARC::Reader.new("spec/data/rule_830.mrc").first
+      end
+
+      it "should replace _-_ with _/_ if present in $a" do
+        new_record = AdjustLibris::RecordRules.rule_830(@record_830)
+        expect(new_record['830']['a']).to eq("Title with / in its name")
+      end
+    end
   end
 end
