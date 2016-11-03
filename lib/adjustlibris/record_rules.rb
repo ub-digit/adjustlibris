@@ -36,7 +36,7 @@ class AdjustLibris
       record = rule_780(record)
       record = rule_785(record)
       record = rule_787(record)
-
+      record = rule_852(record)
       record
     end
 
@@ -413,6 +413,36 @@ class AdjustLibris
       record
     end
 
+    # Remove all 852 without \c in $8 if any 852$8 contains \c
+    def self.rule_852(record)
+      record = clone(record)
+      clean_8_without_c(record, '852')
+      record
+    end
+
+    # Remove all 866 without \c in $8 if any 866$8 contains \c
+    def self.rule_866(record)
+      record = clone(record)
+      clean_8_without_c(record, '866')
+      record
+    end
+
+    # Remove all of field tag without \c in $8 if any such field $8 contains \c
+    # if it is monograph and if it is considered old (1970-2001)
+    def self.clean_8_without_c(record, tag)
+      has_c = record.fields(tag).find { |field| field['8'] && field['8'][/\\c/] }
+      is_old = false
+      # 1970 to 2001
+      if record['008'].value[0..1].to_i >= 70 || record['008'].value[0..1].to_i <= 1
+        is_old = true
+      end
+      record.fields(tag).each do |field|
+        if is_old && record.leader[7] == 'm' && has_c && field['8'] && !field['8'][/\\c/]
+          record.remove(field)
+        end
+      end
+    end
+    
     # Remove hyphens in record $w $x and $z if it does not match ISSN
     def self.remove_hyphens_except_issn(record, tag)
       record.fields(tag).each do |field|

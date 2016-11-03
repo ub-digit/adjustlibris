@@ -903,5 +903,85 @@ describe "AdjustLibris::RecordRules" do
         expect(fields[1]['x']).to eq('1111-1234')
       end
     end
+
+    context "rule_852" do
+      before :each do
+        @record_old_with_c = MARC::Reader.new("spec/data/rule_852_old_with_c.mrc").first
+        @record_old_serial_with_c = MARC::Reader.new("spec/data/rule_852_old_serial_with_c.mrc").first
+        @record_old_without_c = MARC::Reader.new("spec/data/rule_852_old_without_c.mrc").first
+        @record_new_with_c = MARC::Reader.new("spec/data/rule_852_new_with_c.mrc").first
+      end
+
+      it "should clean 852 without \\c when any 852 contains \\c" do
+        new_record = AdjustLibris::RecordRules.rule_852(@record_old_with_c)
+        fields = new_record.fields('852')
+        expect(fields.count).to eq(3)
+      end
+
+      it "should not clean 852 when no 852 contains \\c" do
+        new_record = AdjustLibris::RecordRules.rule_852(@record_old_without_c)
+        fields = new_record.fields('852')
+        expect(fields.count).to eq(4)
+      end
+
+      it "should not clean 852 if record is newer than 2001" do
+        new_record = AdjustLibris::RecordRules.rule_852(@record_new_with_c)
+        fields = new_record.fields('852')
+        expect(fields.count).to eq(4)
+      end
+
+      it "should not clean 852 if record other than monograph" do
+        new_record = AdjustLibris::RecordRules.rule_852(@record_old_serial_with_c)
+        fields = new_record.fields('852')
+        expect(fields.count).to eq(4)
+      end
+    end
+
+    context "rule_866" do
+      private def change_field(record, from_tag, to_tag)
+        record.fields(from_tag).each do |field|
+          record.append(MARC::DataField.new(to_tag, field.indicator1, field.indicator2, *field.subfields))
+          record.remove(field)
+        end
+
+        record
+      end
+      
+      before :each do
+        @record_old_with_c = MARC::Reader.new("spec/data/rule_852_old_with_c.mrc").first
+        @record_old_serial_with_c = MARC::Reader.new("spec/data/rule_852_old_serial_with_c.mrc").first
+        @record_old_without_c = MARC::Reader.new("spec/data/rule_852_old_without_c.mrc").first
+        @record_new_with_c = MARC::Reader.new("spec/data/rule_852_new_with_c.mrc").first
+
+        @record_old_with_c = change_field(@record_old_with_c, '852', '866')
+        @record_old_serial_with_c = change_field(@record_old_serial_with_c, '852', '866')
+        @record_old_without_c = change_field(@record_old_without_c, '852', '866')
+        @record_new_with_c = change_field(@record_new_with_c, '852', '866')
+      end
+
+      it "should clean 866 without \\c when any 866 contains \\c" do
+        new_record = AdjustLibris::RecordRules.rule_866(@record_old_with_c)
+        fields = new_record.fields('866')
+        expect(fields.count).to eq(3)
+      end
+
+      it "should not clean 866 when no 866 contains \\c" do
+        new_record = AdjustLibris::RecordRules.rule_866(@record_old_without_c)
+        fields = new_record.fields('866')
+        expect(fields.count).to eq(4)
+      end
+
+      it "should not clean 866 if record is newer than 2001" do
+        new_record = AdjustLibris::RecordRules.rule_866(@record_new_with_c)
+        fields = new_record.fields('866')
+        expect(fields.count).to eq(4)
+      end
+
+      it "should not clean 866 if record other than monograph" do
+        new_record = AdjustLibris::RecordRules.rule_866(@record_old_serial_with_c)
+        fields = new_record.fields('866')
+        expect(fields.count).to eq(4)
+      end
+    end
   end
 end
