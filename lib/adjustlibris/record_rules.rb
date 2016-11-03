@@ -17,6 +17,26 @@ class AdjustLibris
       record = rule_599_remove(record)
       record = rule_440(record)
       record = rule_830(record)
+      record = rule_650_ind2_7fast(record)
+      record = rule_650_ind2_mesh(record)
+      record = rule_648_ind2_7fast(record)
+      record = rule_648_ind2_mesh(record)
+      record = rule_651_ind2_7fast(record)
+      record = rule_651_ind2_mesh(record)
+      record = rule_655_ind2_7fast(record)
+      record = rule_655_ind2_mesh(record)
+      record = rule_760(record)
+      record = rule_762(record)
+      record = rule_765(record)
+      record = rule_767(record)
+      record = rule_770(record)
+      record = rule_772(record)
+      record = rule_776(record)
+      record = rule_779(record)
+      record = rule_780(record)
+      record = rule_785(record)
+      record = rule_787(record)
+
       record
     end
 
@@ -241,6 +261,7 @@ class AdjustLibris
     def self.rule_440(record)
       record = clone(record)
       record = replace_dashed_separator(record, '440', 'a')
+      record = remove_hyphens_except_issn(record, '440')
       record
     end
 
@@ -315,6 +336,98 @@ class AdjustLibris
       record
     end
 
+    # Remove hyphens in 760$w 760$x and 760$z if it does not match ISSN
+    def self.rule_760(record)
+      record = clone(record)
+      record = remove_hyphens_except_issn(record, '760')
+      record
+    end
+
+    # Remove hyphens in 762$w 762$x and 762$z if it does not match ISSN
+    def self.rule_762(record)
+      record = clone(record)
+      record = remove_hyphens_except_issn(record, '762')
+      record
+    end
+    
+    # Remove hyphens in 765$w 765$x and 765$z if it does not match ISSN
+    def self.rule_765(record)
+      record = clone(record)
+      record = remove_hyphens_except_issn(record, '765')
+      record
+    end
+
+    # Remove hyphens in 767$w 767$x and 767$z if it does not match ISSN
+    def self.rule_767(record)
+      record = clone(record)
+      record = remove_hyphens_except_issn(record, '767')
+      record
+    end
+
+    # Remove hyphens in 770$w 770$x and 770$z if it does not match ISSN
+    def self.rule_770(record)
+      record = clone(record)
+      record = remove_hyphens_except_issn(record, '770')
+      record
+    end
+
+    # Remove hyphens in 772$w 772$x and 772$z if it does not match ISSN
+    def self.rule_772(record)
+      record = clone(record)
+      record = remove_hyphens_except_issn(record, '772')
+      record
+    end
+
+    # Remove hyphens in 776$w 776$x and 776$z if it does not match ISSN
+    def self.rule_776(record)
+      record = clone(record)
+      record = remove_hyphens_except_issn(record, '776')
+      record
+    end
+
+    # Remove hyphens in 779$w 779$x and 779$z if it does not match ISSN
+    def self.rule_779(record)
+      record = clone(record)
+      record = remove_hyphens_except_issn(record, '779')
+      record
+    end
+
+    # Remove hyphens in 780$w 780$x and 780$z if it does not match ISSN
+    def self.rule_780(record)
+      record = clone(record)
+      record = remove_hyphens_except_issn(record, '780')
+      record
+    end
+
+    # Remove hyphens in 785$w 785$x and 785$z if it does not match ISSN
+    def self.rule_785(record)
+      record = clone(record)
+      record = remove_hyphens_except_issn(record, '785')
+      record
+    end
+
+    # Remove hyphens in 787$w 787$x and 787$z if it does not match ISSN
+    def self.rule_787(record)
+      record = clone(record)
+      record = remove_hyphens_except_issn(record, '787')
+      record
+    end
+
+    # Remove hyphens in record $w $x and $z if it does not match ISSN
+    def self.remove_hyphens_except_issn(record, tag)
+      record.fields(tag).each do |field|
+        field.subfields.each do |sf|
+          if ['w', 'x', 'z'].include?(sf.code)
+            # Check if ISSN
+            if !sf.value[/^\d\d\d\d-\d\d\d[\dXx]$/]
+              sf.value = sf.value.gsub(/-/, '')
+            end
+          end
+        end
+      end
+      record
+    end
+    
     # If record$2 contains 'fast' and ind2 is '7', remove it if
     # there exists other records with same tag where ind2 is '0'
     def self.remove_fast_if_lc(record, tag)

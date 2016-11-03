@@ -541,5 +541,367 @@ describe "AdjustLibris::RecordRules" do
         expect(lc_fields.count).to eq(1)
       end
     end
+
+    context "rule_760" do
+      before :each do
+        @record = MARC::Reader.new("spec/data/rule_760.mrc").first
+      end
+
+      it "should remove hyphens in 760$w 760$x and 760$z" do
+        new_record = AdjustLibris::RecordRules.rule_760(@record)
+        fields = new_record.fields('760')
+        expect(fields[1]['w']).to eq('13229222333')
+        expect(fields[2]['x']).to eq('13229222333')
+        expect(fields[2]['z']).to eq('1129233333')
+      end
+
+      it "should not remove hyphens in 760$w 760$x and 760$z if it matches an ISSN (####-####)" do
+        new_record = AdjustLibris::RecordRules.rule_760(@record)
+        fields = new_record.fields('760')
+        expect(fields[0]['w']).to eq('1234-567X')
+        expect(fields[1]['x']).to eq('1111-1234')
+      end
+    end
+
+    context "rule_762" do
+      private def change_field(record, from_tag, to_tag)
+        record.fields(from_tag).each do |field|
+          record.append(MARC::DataField.new(to_tag, field.indicator1, field.indicator2, *field.subfields))
+          record.remove(field)
+        end
+
+        record
+      end
+      
+      before :each do
+        @record = MARC::Reader.new("spec/data/rule_760.mrc").first
+        @record = change_field(@record, '760', '762')
+      end
+
+      it "should remove hyphens in 762$w 762$x and 762$z" do
+        new_record = AdjustLibris::RecordRules.rule_762(@record)
+        fields = new_record.fields('762')
+        expect(fields[1]['w']).to eq('13229222333')
+        expect(fields[2]['x']).to eq('13229222333')
+        expect(fields[2]['z']).to eq('1129233333')
+      end
+
+      it "should not remove hyphens in 762$w 762$x and 762$z if it matches an ISSN (####-####)" do
+        new_record = AdjustLibris::RecordRules.rule_762(@record)
+        fields = new_record.fields('762')
+        expect(fields[0]['w']).to eq('1234-567X')
+        expect(fields[1]['x']).to eq('1111-1234')
+      end
+    end
+
+    context "rule_765" do
+      private def change_field(record, from_tag, to_tag)
+        record.fields(from_tag).each do |field|
+          record.append(MARC::DataField.new(to_tag, field.indicator1, field.indicator2, *field.subfields))
+          record.remove(field)
+        end
+
+        record
+      end
+      
+      before :each do
+        @record = MARC::Reader.new("spec/data/rule_760.mrc").first
+        @record = change_field(@record, '760', '765')
+      end
+
+      it "should remove hyphens in 765$w 765$x and 765$z" do
+        new_record = AdjustLibris::RecordRules.rule_765(@record)
+        fields = new_record.fields('765')
+        expect(fields[1]['w']).to eq('13229222333')
+        expect(fields[2]['x']).to eq('13229222333')
+        expect(fields[2]['z']).to eq('1129233333')
+      end
+
+      it "should not remove hyphens in 765$w 765$x and 765$z if it matches an ISSN (####-####)" do
+        new_record = AdjustLibris::RecordRules.rule_765(@record)
+        fields = new_record.fields('765')
+        expect(fields[0]['w']).to eq('1234-567X')
+        expect(fields[1]['x']).to eq('1111-1234')
+      end
+    end
+
+    context "rule_767" do
+      private def change_field(record, from_tag, to_tag)
+        record.fields(from_tag).each do |field|
+          record.append(MARC::DataField.new(to_tag, field.indicator1, field.indicator2, *field.subfields))
+          record.remove(field)
+        end
+
+        record
+      end
+      
+      before :each do
+        @record = MARC::Reader.new("spec/data/rule_760.mrc").first
+        @record = change_field(@record, '760', '767')
+      end
+
+      it "should remove hyphens in 767$w 767$x and 767$z" do
+        new_record = AdjustLibris::RecordRules.rule_767(@record)
+        fields = new_record.fields('767')
+        expect(fields[1]['w']).to eq('13229222333')
+        expect(fields[2]['x']).to eq('13229222333')
+        expect(fields[2]['z']).to eq('1129233333')
+      end
+
+      it "should not remove hyphens in 767$w 767$x and 767$z if it matches an ISSN (####-####)" do
+        new_record = AdjustLibris::RecordRules.rule_767(@record)
+        fields = new_record.fields('767')
+        expect(fields[0]['w']).to eq('1234-567X')
+        expect(fields[1]['x']).to eq('1111-1234')
+      end
+    end
+
+    context "rule_770" do
+      private def change_field(record, from_tag, to_tag)
+        record.fields(from_tag).each do |field|
+          record.append(MARC::DataField.new(to_tag, field.indicator1, field.indicator2, *field.subfields))
+          record.remove(field)
+        end
+
+        record
+      end
+      
+      before :each do
+        @record = MARC::Reader.new("spec/data/rule_760.mrc").first
+        @record = change_field(@record, '760', '770')
+      end
+
+      it "should remove hyphens in 770$w 770$x and 770$z" do
+        new_record = AdjustLibris::RecordRules.rule_770(@record)
+        fields = new_record.fields('770')
+        expect(fields[1]['w']).to eq('13229222333')
+        expect(fields[2]['x']).to eq('13229222333')
+        expect(fields[2]['z']).to eq('1129233333')
+      end
+
+      it "should not remove hyphens in 770$w 770$x and 770$z if it matches an ISSN (####-####)" do
+        new_record = AdjustLibris::RecordRules.rule_770(@record)
+        fields = new_record.fields('770')
+        expect(fields[0]['w']).to eq('1234-567X')
+        expect(fields[1]['x']).to eq('1111-1234')
+      end
+    end
+
+    context "rule_772" do
+      private def change_field(record, from_tag, to_tag)
+        record.fields(from_tag).each do |field|
+          record.append(MARC::DataField.new(to_tag, field.indicator1, field.indicator2, *field.subfields))
+          record.remove(field)
+        end
+
+        record
+      end
+      
+      before :each do
+        @record = MARC::Reader.new("spec/data/rule_760.mrc").first
+        @record = change_field(@record, '760', '772')
+      end
+
+      it "should remove hyphens in 772$w 772$x and 772$z" do
+        new_record = AdjustLibris::RecordRules.rule_772(@record)
+        fields = new_record.fields('772')
+        expect(fields[1]['w']).to eq('13229222333')
+        expect(fields[2]['x']).to eq('13229222333')
+        expect(fields[2]['z']).to eq('1129233333')
+      end
+
+      it "should not remove hyphens in 772$w 772$x and 772$z if it matches an ISSN (####-####)" do
+        new_record = AdjustLibris::RecordRules.rule_772(@record)
+        fields = new_record.fields('772')
+        expect(fields[0]['w']).to eq('1234-567X')
+        expect(fields[1]['x']).to eq('1111-1234')
+      end
+    end
+
+    context "rule_776" do
+      private def change_field(record, from_tag, to_tag)
+        record.fields(from_tag).each do |field|
+          record.append(MARC::DataField.new(to_tag, field.indicator1, field.indicator2, *field.subfields))
+          record.remove(field)
+        end
+
+        record
+      end
+      
+      before :each do
+        @record = MARC::Reader.new("spec/data/rule_760.mrc").first
+        @record = change_field(@record, '760', '776')
+      end
+
+      it "should remove hyphens in 776$w 776$x and 776$z" do
+        new_record = AdjustLibris::RecordRules.rule_776(@record)
+        fields = new_record.fields('776')
+        expect(fields[1]['w']).to eq('13229222333')
+        expect(fields[2]['x']).to eq('13229222333')
+        expect(fields[2]['z']).to eq('1129233333')
+      end
+
+      it "should not remove hyphens in 776$w 776$x and 776$z if it matches an ISSN (####-####)" do
+        new_record = AdjustLibris::RecordRules.rule_776(@record)
+        fields = new_record.fields('776')
+        expect(fields[0]['w']).to eq('1234-567X')
+        expect(fields[1]['x']).to eq('1111-1234')
+      end
+    end
+
+    context "rule_779" do
+      private def change_field(record, from_tag, to_tag)
+        record.fields(from_tag).each do |field|
+          record.append(MARC::DataField.new(to_tag, field.indicator1, field.indicator2, *field.subfields))
+          record.remove(field)
+        end
+
+        record
+      end
+      
+      before :each do
+        @record = MARC::Reader.new("spec/data/rule_760.mrc").first
+        @record = change_field(@record, '760', '779')
+      end
+
+      it "should remove hyphens in 779$w 779$x and 779$z" do
+        new_record = AdjustLibris::RecordRules.rule_779(@record)
+        fields = new_record.fields('779')
+        expect(fields[1]['w']).to eq('13229222333')
+        expect(fields[2]['x']).to eq('13229222333')
+        expect(fields[2]['z']).to eq('1129233333')
+      end
+
+      it "should not remove hyphens in 779$w 779$x and 779$z if it matches an ISSN (####-####)" do
+        new_record = AdjustLibris::RecordRules.rule_779(@record)
+        fields = new_record.fields('779')
+        expect(fields[0]['w']).to eq('1234-567X')
+        expect(fields[1]['x']).to eq('1111-1234')
+      end
+    end
+
+    context "rule_780" do
+      private def change_field(record, from_tag, to_tag)
+        record.fields(from_tag).each do |field|
+          record.append(MARC::DataField.new(to_tag, field.indicator1, field.indicator2, *field.subfields))
+          record.remove(field)
+        end
+
+        record
+      end
+      
+      before :each do
+        @record = MARC::Reader.new("spec/data/rule_760.mrc").first
+        @record = change_field(@record, '760', '780')
+      end
+
+      it "should remove hyphens in 780$w 780$x and 780$z" do
+        new_record = AdjustLibris::RecordRules.rule_780(@record)
+        fields = new_record.fields('780')
+        expect(fields[1]['w']).to eq('13229222333')
+        expect(fields[2]['x']).to eq('13229222333')
+        expect(fields[2]['z']).to eq('1129233333')
+      end
+
+      it "should not remove hyphens in 780$w 780$x and 780$z if it matches an ISSN (####-####)" do
+        new_record = AdjustLibris::RecordRules.rule_780(@record)
+        fields = new_record.fields('780')
+        expect(fields[0]['w']).to eq('1234-567X')
+        expect(fields[1]['x']).to eq('1111-1234')
+      end
+    end
+
+    context "rule_785" do
+      private def change_field(record, from_tag, to_tag)
+        record.fields(from_tag).each do |field|
+          record.append(MARC::DataField.new(to_tag, field.indicator1, field.indicator2, *field.subfields))
+          record.remove(field)
+        end
+
+        record
+      end
+      
+      before :each do
+        @record = MARC::Reader.new("spec/data/rule_760.mrc").first
+        @record = change_field(@record, '760', '785')
+      end
+
+      it "should remove hyphens in 785$w 785$x and 785$z" do
+        new_record = AdjustLibris::RecordRules.rule_785(@record)
+        fields = new_record.fields('785')
+        expect(fields[1]['w']).to eq('13229222333')
+        expect(fields[2]['x']).to eq('13229222333')
+        expect(fields[2]['z']).to eq('1129233333')
+      end
+
+      it "should not remove hyphens in 785$w 785$x and 785$z if it matches an ISSN (####-####)" do
+        new_record = AdjustLibris::RecordRules.rule_785(@record)
+        fields = new_record.fields('785')
+        expect(fields[0]['w']).to eq('1234-567X')
+        expect(fields[1]['x']).to eq('1111-1234')
+      end
+    end
+
+    context "rule_787" do
+      private def change_field(record, from_tag, to_tag)
+        record.fields(from_tag).each do |field|
+          record.append(MARC::DataField.new(to_tag, field.indicator1, field.indicator2, *field.subfields))
+          record.remove(field)
+        end
+
+        record
+      end
+      
+      before :each do
+        @record = MARC::Reader.new("spec/data/rule_760.mrc").first
+        @record = change_field(@record, '760', '787')
+      end
+
+      it "should remove hyphens in 787$w 787$x and 787$z" do
+        new_record = AdjustLibris::RecordRules.rule_787(@record)
+        fields = new_record.fields('787')
+        expect(fields[1]['w']).to eq('13229222333')
+        expect(fields[2]['x']).to eq('13229222333')
+        expect(fields[2]['z']).to eq('1129233333')
+      end
+
+      it "should not remove hyphens in 787$w 787$x and 787$z if it matches an ISSN (####-####)" do
+        new_record = AdjustLibris::RecordRules.rule_787(@record)
+        fields = new_record.fields('787')
+        expect(fields[0]['w']).to eq('1234-567X')
+        expect(fields[1]['x']).to eq('1111-1234')
+      end
+    end
+
+    context "rule_440" do
+      private def change_field(record, from_tag, to_tag)
+        record.fields(from_tag).each do |field|
+          record.append(MARC::DataField.new(to_tag, field.indicator1, field.indicator2, *field.subfields))
+          record.remove(field)
+        end
+
+        record
+      end
+      
+      before :each do
+        @record = MARC::Reader.new("spec/data/rule_760.mrc").first
+        @record = change_field(@record, '760', '440')
+      end
+
+      it "should remove hyphens in 440$w 440$x and 440$z" do
+        new_record = AdjustLibris::RecordRules.rule_440(@record)
+        fields = new_record.fields('440')
+        expect(fields[1]['w']).to eq('13229222333')
+        expect(fields[2]['x']).to eq('13229222333')
+        expect(fields[2]['z']).to eq('1129233333')
+      end
+
+      it "should not remove hyphens in 440$w 440$x and 440$z if it matches an ISSN (####-####)" do
+        new_record = AdjustLibris::RecordRules.rule_440(@record)
+        fields = new_record.fields('440')
+        expect(fields[0]['w']).to eq('1234-567X')
+        expect(fields[1]['x']).to eq('1111-1234')
+      end
+    end
   end
 end
