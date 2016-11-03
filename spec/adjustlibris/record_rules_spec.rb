@@ -244,5 +244,302 @@ describe "AdjustLibris::RecordRules" do
         expect(new_record['830']['a']).to eq("Title with / in its name")
       end
     end
+
+    context "rule_650" do
+      before :each do
+        @record_with_ind2_0 = MARC::Reader.new("spec/data/rule_650-ind2_7fast_with_ind2_0.mrc").first
+        @record_without_ind2_0 = MARC::Reader.new("spec/data/rule_650-ind2_7fast_without_ind2_0.mrc").first
+        @record_mesh_and_lc_no_dup = MARC::Reader.new("spec/data/rule_650-ind2_2_and_ind2_0_no_dup.mrc").first
+        @record_mesh_without_lc = MARC::Reader.new("spec/data/rule_650-ind2_2_without_ind2_0.mrc").first
+        @record_mesh_and_lc_with_dup = MARC::Reader.new("spec/data/rule_650-ind2_2_and_ind2_0_with_dup.mrc").first
+      end
+
+      it "should remove 650 fields with ind2 == 7 and $2 == fast when any field with ind2 == 0 exists" do
+        new_record = AdjustLibris::RecordRules.rule_650_ind2_7fast(@record_with_ind2_0)
+        fields = new_record.fields('650')
+        fast_fields = fields.select do |field|
+          field.indicator2 == '7' && field['2'] == 'fast'
+        end
+        expect(fast_fields.count).to eq(0)
+      end
+
+      it "should remove not 650 fields with ind2 == 7 and $2 == fast when there are no ind2 == 0 fields" do
+        new_record = AdjustLibris::RecordRules.rule_650_ind2_7fast(@record_without_ind2_0)
+        fields = new_record.fields('650')
+        fast_fields = fields.select do |field|
+          field.indicator2 == '7' && field['2'] == 'fast'
+        end
+        expect(fast_fields.count).to eq(3)
+      end
+
+      it "should keep all ind2 == 2 when as is when no ind2 == 0 exists" do
+        new_record = AdjustLibris::RecordRules.rule_650_ind2_mesh(@record_mesh_without_lc)
+        fields = new_record.fields('650')
+        mesh_fields = fields.select do |field|
+          field.indicator2 == '2'
+        end
+        expect(mesh_fields.count).to eq(3)
+      end
+
+      it "should keep all ind2 == 2 and ind2 == 0 when they do not overlap" do
+        new_record = AdjustLibris::RecordRules.rule_650_ind2_mesh(@record_mesh_and_lc_no_dup)
+        fields = new_record.fields('650')
+        mesh_fields = fields.select do |field|
+          field.indicator2 == '2'
+        end
+        lc_fields = fields.select do |field|
+          field.indicator2 == '0'
+        end
+        expect(mesh_fields.count).to eq(3)
+        expect(lc_fields.count).to eq(3)
+      end
+
+      it "should keep ind2 == 2 and ind2 == 0 but only ind2 == 2 when duplicate with ind2 == 0" do
+        new_record = AdjustLibris::RecordRules.rule_650_ind2_mesh(@record_mesh_and_lc_with_dup)
+        fields = new_record.fields('650')
+        mesh_fields = fields.select do |field|
+          field.indicator2 == '2'
+        end
+        lc_fields = fields.select do |field|
+          field.indicator2 == '0'
+        end
+        expect(mesh_fields.count).to eq(3)
+        expect(lc_fields.count).to eq(1)
+      end
+    end
+
+    context "rule_648" do
+      private def change_field(record, from_tag, to_tag)
+        record.fields(from_tag).each do |field|
+          record.append(MARC::DataField.new(to_tag, field.indicator1, field.indicator2, *field.subfields))
+          record.remove(field)
+        end
+
+        record
+      end
+      
+      before :each do
+        @record_with_ind2_0 = MARC::Reader.new("spec/data/rule_650-ind2_7fast_with_ind2_0.mrc").first
+        @record_without_ind2_0 = MARC::Reader.new("spec/data/rule_650-ind2_7fast_without_ind2_0.mrc").first
+        @record_mesh_and_lc_no_dup = MARC::Reader.new("spec/data/rule_650-ind2_2_and_ind2_0_no_dup.mrc").first
+        @record_mesh_without_lc = MARC::Reader.new("spec/data/rule_650-ind2_2_without_ind2_0.mrc").first
+        @record_mesh_and_lc_with_dup = MARC::Reader.new("spec/data/rule_650-ind2_2_and_ind2_0_with_dup.mrc").first
+
+        change_field(@record_with_ind2_0, '650', '648')
+        change_field(@record_without_ind2_0, '650', '648')
+        change_field(@record_mesh_and_lc_no_dup, '650', '648')
+        change_field(@record_mesh_without_lc, '650', '648')
+        change_field(@record_mesh_and_lc_with_dup, '650', '648')
+      end
+
+      it "should remove 648 fields with ind2 == 7 and $2 == fast when any field with ind2 == 0 exists" do
+        new_record = AdjustLibris::RecordRules.rule_648_ind2_7fast(@record_with_ind2_0)
+        fields = new_record.fields('648')
+        fast_fields = fields.select do |field|
+          field.indicator2 == '7' && field['2'] == 'fast'
+        end
+        expect(fast_fields.count).to eq(0)
+      end
+
+      it "should remove not 648 fields with ind2 == 7 and $2 == fast when there are no ind2 == 0 fields" do
+        new_record = AdjustLibris::RecordRules.rule_648_ind2_7fast(@record_without_ind2_0)
+        fields = new_record.fields('648')
+        fast_fields = fields.select do |field|
+          field.indicator2 == '7' && field['2'] == 'fast'
+        end
+        expect(fast_fields.count).to eq(3)
+      end
+
+      it "should keep all ind2 == 2 when as is when no ind2 == 0 exists" do
+        new_record = AdjustLibris::RecordRules.rule_648_ind2_mesh(@record_mesh_without_lc)
+        fields = new_record.fields('648')
+        mesh_fields = fields.select do |field|
+          field.indicator2 == '2'
+        end
+        expect(mesh_fields.count).to eq(3)
+      end
+
+      it "should keep all ind2 == 2 and ind2 == 0 when they do not overlap" do
+        new_record = AdjustLibris::RecordRules.rule_648_ind2_mesh(@record_mesh_and_lc_no_dup)
+        fields = new_record.fields('648')
+        mesh_fields = fields.select do |field|
+          field.indicator2 == '2'
+        end
+        lc_fields = fields.select do |field|
+          field.indicator2 == '0'
+        end
+        expect(mesh_fields.count).to eq(3)
+        expect(lc_fields.count).to eq(3)
+      end
+
+      it "should keep ind2 == 2 and ind2 == 0 but only ind2 == 2 when duplicate with ind2 == 0" do
+        new_record = AdjustLibris::RecordRules.rule_648_ind2_mesh(@record_mesh_and_lc_with_dup)
+        fields = new_record.fields('648')
+        mesh_fields = fields.select do |field|
+          field.indicator2 == '2'
+        end
+        lc_fields = fields.select do |field|
+          field.indicator2 == '0'
+        end
+        expect(mesh_fields.count).to eq(3)
+        expect(lc_fields.count).to eq(1)
+      end
+    end
+
+    context "rule_651" do
+      private def change_field(record, from_tag, to_tag)
+        record.fields(from_tag).each do |field|
+          record.append(MARC::DataField.new(to_tag, field.indicator1, field.indicator2, *field.subfields))
+          record.remove(field)
+        end
+
+        record
+      end
+      
+      before :each do
+        @record_with_ind2_0 = MARC::Reader.new("spec/data/rule_650-ind2_7fast_with_ind2_0.mrc").first
+        @record_without_ind2_0 = MARC::Reader.new("spec/data/rule_650-ind2_7fast_without_ind2_0.mrc").first
+        @record_mesh_and_lc_no_dup = MARC::Reader.new("spec/data/rule_650-ind2_2_and_ind2_0_no_dup.mrc").first
+        @record_mesh_without_lc = MARC::Reader.new("spec/data/rule_650-ind2_2_without_ind2_0.mrc").first
+        @record_mesh_and_lc_with_dup = MARC::Reader.new("spec/data/rule_650-ind2_2_and_ind2_0_with_dup.mrc").first
+
+        change_field(@record_with_ind2_0, '650', '651')
+        change_field(@record_without_ind2_0, '650', '651')
+        change_field(@record_mesh_and_lc_no_dup, '650', '651')
+        change_field(@record_mesh_without_lc, '650', '651')
+        change_field(@record_mesh_and_lc_with_dup, '650', '651')
+      end
+
+      it "should remove 651 fields with ind2 == 7 and $2 == fast when any field with ind2 == 0 exists" do
+        new_record = AdjustLibris::RecordRules.rule_651_ind2_7fast(@record_with_ind2_0)
+        fields = new_record.fields('651')
+        fast_fields = fields.select do |field|
+          field.indicator2 == '7' && field['2'] == 'fast'
+        end
+        expect(fast_fields.count).to eq(0)
+      end
+
+      it "should remove not 651 fields with ind2 == 7 and $2 == fast when there are no ind2 == 0 fields" do
+        new_record = AdjustLibris::RecordRules.rule_651_ind2_7fast(@record_without_ind2_0)
+        fields = new_record.fields('651')
+        fast_fields = fields.select do |field|
+          field.indicator2 == '7' && field['2'] == 'fast'
+        end
+        expect(fast_fields.count).to eq(3)
+      end
+
+      it "should keep all ind2 == 2 when as is when no ind2 == 0 exists" do
+        new_record = AdjustLibris::RecordRules.rule_651_ind2_mesh(@record_mesh_without_lc)
+        fields = new_record.fields('651')
+        mesh_fields = fields.select do |field|
+          field.indicator2 == '2'
+        end
+        expect(mesh_fields.count).to eq(3)
+      end
+
+      it "should keep all ind2 == 2 and ind2 == 0 when they do not overlap" do
+        new_record = AdjustLibris::RecordRules.rule_651_ind2_mesh(@record_mesh_and_lc_no_dup)
+        fields = new_record.fields('651')
+        mesh_fields = fields.select do |field|
+          field.indicator2 == '2'
+        end
+        lc_fields = fields.select do |field|
+          field.indicator2 == '0'
+        end
+        expect(mesh_fields.count).to eq(3)
+        expect(lc_fields.count).to eq(3)
+      end
+
+      it "should keep ind2 == 2 and ind2 == 0 but only ind2 == 2 when duplicate with ind2 == 0" do
+        new_record = AdjustLibris::RecordRules.rule_651_ind2_mesh(@record_mesh_and_lc_with_dup)
+        fields = new_record.fields('651')
+        mesh_fields = fields.select do |field|
+          field.indicator2 == '2'
+        end
+        lc_fields = fields.select do |field|
+          field.indicator2 == '0'
+        end
+        expect(mesh_fields.count).to eq(3)
+        expect(lc_fields.count).to eq(1)
+      end
+    end
+
+    context "rule_655" do
+      private def change_field(record, from_tag, to_tag)
+        record.fields(from_tag).each do |field|
+          record.append(MARC::DataField.new(to_tag, field.indicator1, field.indicator2, *field.subfields))
+          record.remove(field)
+        end
+
+        record
+      end
+      
+      before :each do
+        @record_with_ind2_0 = MARC::Reader.new("spec/data/rule_650-ind2_7fast_with_ind2_0.mrc").first
+        @record_without_ind2_0 = MARC::Reader.new("spec/data/rule_650-ind2_7fast_without_ind2_0.mrc").first
+        @record_mesh_and_lc_no_dup = MARC::Reader.new("spec/data/rule_650-ind2_2_and_ind2_0_no_dup.mrc").first
+        @record_mesh_without_lc = MARC::Reader.new("spec/data/rule_650-ind2_2_without_ind2_0.mrc").first
+        @record_mesh_and_lc_with_dup = MARC::Reader.new("spec/data/rule_650-ind2_2_and_ind2_0_with_dup.mrc").first
+
+        change_field(@record_with_ind2_0, '650', '655')
+        change_field(@record_without_ind2_0, '650', '655')
+        change_field(@record_mesh_and_lc_no_dup, '650', '655')
+        change_field(@record_mesh_without_lc, '650', '655')
+        change_field(@record_mesh_and_lc_with_dup, '650', '655')
+      end
+
+      it "should remove 655 fields with ind2 == 7 and $2 == fast when any field with ind2 == 0 exists" do
+        new_record = AdjustLibris::RecordRules.rule_655_ind2_7fast(@record_with_ind2_0)
+        fields = new_record.fields('655')
+        fast_fields = fields.select do |field|
+          field.indicator2 == '7' && field['2'] == 'fast'
+        end
+        expect(fast_fields.count).to eq(0)
+      end
+
+      it "should remove not 655 fields with ind2 == 7 and $2 == fast when there are no ind2 == 0 fields" do
+        new_record = AdjustLibris::RecordRules.rule_655_ind2_7fast(@record_without_ind2_0)
+        fields = new_record.fields('655')
+        fast_fields = fields.select do |field|
+          field.indicator2 == '7' && field['2'] == 'fast'
+        end
+        expect(fast_fields.count).to eq(3)
+      end
+
+      it "should keep all ind2 == 2 when as is when no ind2 == 0 exists" do
+        new_record = AdjustLibris::RecordRules.rule_655_ind2_mesh(@record_mesh_without_lc)
+        fields = new_record.fields('655')
+        mesh_fields = fields.select do |field|
+          field.indicator2 == '2'
+        end
+        expect(mesh_fields.count).to eq(3)
+      end
+
+      it "should keep all ind2 == 2 and ind2 == 0 when they do not overlap" do
+        new_record = AdjustLibris::RecordRules.rule_655_ind2_mesh(@record_mesh_and_lc_no_dup)
+        fields = new_record.fields('655')
+        mesh_fields = fields.select do |field|
+          field.indicator2 == '2'
+        end
+        lc_fields = fields.select do |field|
+          field.indicator2 == '0'
+        end
+        expect(mesh_fields.count).to eq(3)
+        expect(lc_fields.count).to eq(3)
+      end
+
+      it "should keep ind2 == 2 and ind2 == 0 but only ind2 == 2 when duplicate with ind2 == 0" do
+        new_record = AdjustLibris::RecordRules.rule_655_ind2_mesh(@record_mesh_and_lc_with_dup)
+        fields = new_record.fields('655')
+        mesh_fields = fields.select do |field|
+          field.indicator2 == '2'
+        end
+        lc_fields = fields.select do |field|
+          field.indicator2 == '0'
+        end
+        expect(mesh_fields.count).to eq(3)
+        expect(lc_fields.count).to eq(1)
+      end
+    end
   end
 end

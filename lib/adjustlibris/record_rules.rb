@@ -251,7 +251,108 @@ class AdjustLibris
       record
     end
 
-    def self.replace_dashed_separator(record, tag, subfield_code = 'a')
+    # If 650$2 contains 'fast' and ind2 is '7', remove it if
+    # there exists other 650 fields where ind2 is '0'
+    def self.rule_650_ind2_7fast(record)
+      record = clone(record)
+      record = remove_fast_if_lc(record, '650')
+      record
+    end
+
+    # If 650 ind2 is '2' (mesh) and ind2 is '0' (LC) is in the same record,
+    # keep both, but only mesh if they are duplicates.
+    def self.rule_650_ind2_mesh(record)
+      record = clone(record)
+      record = remove_duplicate_lc_if_mesh(record, '650')
+      record
+    end
+
+    # If 648$2 contains 'fast' and ind2 is '7', remove it if
+    # there exists other 648 fields where ind2 is '0'
+    def self.rule_648_ind2_7fast(record)
+      record = clone(record)
+      record = remove_fast_if_lc(record, '648')
+      record
+    end
+
+    # If 648 ind2 is '2' (mesh) and ind2 is '0' (LC) is in the same record,
+    # keep both, but only mesh if they are duplicates.
+    def self.rule_648_ind2_mesh(record)
+      record = clone(record)
+      record = remove_duplicate_lc_if_mesh(record, '648')
+      record
+    end
+
+    # If 651$2 contains 'fast' and ind2 is '7', remove it if
+    # there exists other 651 fields where ind2 is '0'
+    def self.rule_651_ind2_7fast(record)
+      record = clone(record)
+      record = remove_fast_if_lc(record, '651')
+      record
+    end
+
+    # If 651 ind2 is '2' (mesh) and ind2 is '0' (LC) is in the same record,
+    # keep both, but only mesh if they are duplicates.
+    def self.rule_651_ind2_mesh(record)
+      record = clone(record)
+      record = remove_duplicate_lc_if_mesh(record, '651')
+      record
+    end
+
+    # If 655$2 contains 'fast' and ind2 is '7', remove it if
+    # there exists other 655 fields where ind2 is '0'
+    def self.rule_655_ind2_7fast(record)
+      record = clone(record)
+      record = remove_fast_if_lc(record, '655')
+      record
+    end
+
+    # If 655 ind2 is '2' (mesh) and ind2 is '0' (LC) is in the same record,
+    # keep both, but only mesh if they are duplicates.
+    def self.rule_655_ind2_mesh(record)
+      record = clone(record)
+      record = remove_duplicate_lc_if_mesh(record, '655')
+      record
+    end
+
+    # If record$2 contains 'fast' and ind2 is '7', remove it if
+    # there exists other records with same tag where ind2 is '0'
+    def self.remove_fast_if_lc(record, tag)
+      has_ind0 = record.fields(tag).find { |f| f.indicator2 == '0' }
+      if has_ind0
+        record.fields(tag).each do |field|
+          if field.indicator2 == '7' && field['2'] == 'fast'
+            record.remove(field)
+          end
+        end
+      end
+      record
+    end
+
+    # If record ind2 is '2' (mesh) and ind2 is '0' (LC) is in the same record,
+    # keep both, but only mesh if they are duplicates.
+    def self.remove_duplicate_lc_if_mesh(record, tag)
+      mesh_fields = {}
+      record.fields(tag).each do |field|
+        if field.indicator2 == '2'
+          mesh_data = field.subfields.map { |sf| "$#{sf.code} #{sf.value}"}.join(" ")
+          mesh_fields[mesh_data] = field
+        end
+      end
+      record.fields(tag).each do |field|
+        if field.indicator2 == '0'
+          lc_data = field.subfields.map { |sf| "$#{sf.code} #{sf.value}"}.join(" ")
+          # Check if there is a mesh term for this already
+          if mesh_fields[lc_data]
+            record.remove(field)
+          end
+        end
+      end
+      record
+    end
+    
+    # Replace ' - ' with ' / ' in specified field and subfield
+    def self.replace_dashed_separator(record, tag, subfield_code)
       if record[tag] && record[tag][subfield_code] && record[tag][subfield_code][/ - /]
         subfield = record[tag].subfields.find_all { |sf| sf.code == subfield_code}.first
         subfield.value = record[tag][subfield_code].gsub(/ - /, ' / ')
