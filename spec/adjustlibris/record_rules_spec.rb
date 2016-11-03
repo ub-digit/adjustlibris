@@ -983,5 +983,24 @@ describe "AdjustLibris::RecordRules" do
         expect(fields.count).to eq(4)
       end
     end
+
+    context "rule_976" do
+      before :each do
+        @record = MARC::Reader.new("spec/data/rule_976.mrc").first
+#        @record_830 = MARC::Reader.new("spec/data/rule_830.mrc").first
+#        w = MARC::Writer.new("spec/data/rule_976.mrc")
+#        rec = AdjustLibris::RecordRules.clone(@record_830)
+#        rec.remove('976')
+#        rec.append(MARC::DataField.new('976', ' ', ' ', ['a', 'Abc'], ['b', 'Test Test Test']))
+#        w.write(rec)
+#        w.close
+      end
+
+      it "should remove 976$a and move $b to $a" do
+        new_record = AdjustLibris::RecordRules.rule_976(@record)
+        expect(new_record['976']['a']).to eq("Test Test Test")
+        expect(new_record['976']['b']).to be_nil
+      end
+    end
   end
 end

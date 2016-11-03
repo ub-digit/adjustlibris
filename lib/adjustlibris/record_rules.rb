@@ -37,6 +37,8 @@ class AdjustLibris
       record = rule_785(record)
       record = rule_787(record)
       record = rule_852(record)
+      record = rule_866(record)
+      record = rule_976(record)
       record
     end
 
@@ -427,6 +429,20 @@ class AdjustLibris
       record
     end
 
+    # Remove 976$a and move $b to $a
+    def self.rule_976(record)
+      record = clone(record)
+      record.fields('976').each do |field|
+        subfield_a = field.subfields.find { |sf| sf.code == 'a' }
+        if subfield_a
+          field.remove(subfield_a)
+          field.append(MARC::Subfield.new('a', field['b']))
+          field.remove('b')
+        end
+      end
+      record
+    end
+    
     # Remove all of field tag without \c in $8 if any such field $8 contains \c
     # if it is monograph and if it is considered old (1970-2001)
     def self.clean_8_without_c(record, tag)
