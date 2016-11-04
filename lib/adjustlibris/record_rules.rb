@@ -56,7 +56,7 @@ class AdjustLibris
       end
       lang = f008.value[35..37]
       if !["und", "xxx", "mul"].include?(lang) && !record["041"]
-        record.append(MARC::DataField.new('041', '', '', ['a', lang]))
+        record.append(MARC::DataField.new('041', ' ', ' ', ['a', lang]))
       end
       record
     end
