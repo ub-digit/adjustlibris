@@ -161,7 +161,7 @@ class AdjustLibris
       highest_kssb_for_a = {}
       idx_to_remove = []
 
-      # Parse through fields, ignoring anything not 030.
+      # Parse through fields, ignoring anything not 084.
       # Store all indexes to remove
       record.fields.each.with_index do |field,idx|
         next if field.tag != "084"
@@ -418,14 +418,14 @@ class AdjustLibris
     # Remove all 852 without \c in $8 if any 852$8 contains \c
     def self.rule_852(record)
       record = clone(record)
-      clean_8_without_c(record, '852')
+      record = clean_8_without_c(record, '852')
       record
     end
 
     # Remove all 866 without \c in $8 if any 866$8 contains \c
     def self.rule_866(record)
       record = clone(record)
-      clean_8_without_c(record, '866')
+      record = clean_8_without_c(record, '866')
       record
     end
 
@@ -457,6 +457,7 @@ class AdjustLibris
           record.remove(field)
         end
       end
+      record
     end
     
     # Remove hyphens in record $w $x and $z if it does not match ISSN
