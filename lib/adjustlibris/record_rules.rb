@@ -165,7 +165,7 @@ class AdjustLibris
       # Store all indexes to remove
       record.fields.each.with_index do |field,idx|
         next if field.tag != "084"
-        if field['a'] && field['2'][/^kssb/]
+        if field['a'] && field['2'] && field['2'][/^kssb/]
           if found_a_fields.include?(field['a'])
             # If the current field has a lower kssb-value than a previously stored field,
             # mark this one for removal, otherwise remove the previously stored field,
