@@ -4,6 +4,7 @@ class AdjustLibris
     def self.apply(record)
       record = rule_041(record)
       record = rule_020(record)
+      record = rule_030(record)
       record = rule_035_9(record)
       record = rule_035_9_to_a(record)
       record = rule_035_5(record)
