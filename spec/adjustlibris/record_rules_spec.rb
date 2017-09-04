@@ -102,6 +102,20 @@ describe "AdjustLibris::RecordRules" do
       end
     end
 
+    context "rule_082" do
+      before :each do
+        @record_082 = MARC::Reader.new("spec/data/rule_082.mrc").first
+      end
+
+      it "should deduplicate 082" do
+        old_fields = @record_082.fields('082')
+        expect(old_fields.count).to eq(2)
+        new_record = AdjustLibris::RecordRules.rule_082(@record_082)
+        fields = new_record.fields('082')
+        expect(fields.count).to eq(1)
+      end
+    end
+
     context "rule_084" do
       before :each do
         @record_084_without_sub5_2 = MARC::Reader.new("spec/data/rule_084-without_sub5_2.mrc").first

@@ -8,6 +8,7 @@ class AdjustLibris
       record = rule_035_9(record)
       record = rule_035_9_to_a(record)
       record = rule_035_5(record)
+      record = rule_082(record)
       record = rule_084_5_2(record)
       record = rule_084_kssb(record)
       record = rule_084_5_not2(record)
@@ -144,6 +145,33 @@ class AdjustLibris
       record
     end
 
+    # Deduplicate 082 on exact match
+    def self.rule_082(record)
+      record = clone(record)
+      
+      found_fields = []
+      idx_to_remove = []
+
+      # Parse through fields, ignoring anything not 082.
+      # Store all indexes to remove
+      record.fields.each.with_index do |field,idx|
+        next if field.tag != "082"
+        if found_fields.include?(field)
+          idx_to_remove << idx
+          next
+        else
+          found_fields << field
+        end
+      end
+
+      # Remove all indexes in reverse order (highest first)
+      # so that index numbering isn't thrown off
+      idx_to_remove.reverse.each do |idx|
+        record.remove_at(idx)
+      end
+      record
+    end
+    
     # Remove all 084 where neither $5 nor $2 exists.
     def self.rule_084_5_2(record)
       record = clone(record)
