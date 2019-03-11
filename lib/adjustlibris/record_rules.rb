@@ -458,12 +458,13 @@ class AdjustLibris
       record
     end
 
-    # Remove 976$a and move $b to $a
+    # Remove 976$a and move $b to $a if $b exists
     def self.rule_976(record)
       record = clone(record)
       record.fields('976').each do |field|
         subfield_a = field.subfields.find { |sf| sf.code == 'a' }
-        if subfield_a
+        subfield_b = field.subfields.find { |sf| sf.code == 'b' }
+        if subfield_a && subfield_b
           field.remove(subfield_a)
           field.append(MARC::Subfield.new('a', field['b']))
           field.remove('b')
