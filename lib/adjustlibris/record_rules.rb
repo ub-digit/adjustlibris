@@ -1,3 +1,5 @@
+require 'pp'
+
 class AdjustLibris
   class RecordRules
     # Apply in turn each and every rule, and return a record in the end.
@@ -104,7 +106,7 @@ class AdjustLibris
 
       # Remove all indexes in reverse order (highest first)
       # so that index numbering isn't thrown off
-      idx_to_remove.reverse.each do |idx|
+      idx_to_remove.sort.reverse.each do |idx|
         record.remove_at(idx)
       end
       record
@@ -166,7 +168,7 @@ class AdjustLibris
 
       # Remove all indexes in reverse order (highest first)
       # so that index numbering isn't thrown off
-      idx_to_remove.reverse.each do |idx|
+      idx_to_remove.sort.reverse.each do |idx|
         record.remove_at(idx)
       end
       record
@@ -215,7 +217,7 @@ class AdjustLibris
 
       # Remove all indexes in reverse order (highest first)
       # so that index numbering isn't thrown off
-      idx_to_remove.reverse.each do |idx|
+      idx_to_remove.sort.reverse.each do |idx|
         record.remove_at(idx)
       end
       record
@@ -458,12 +460,13 @@ class AdjustLibris
       record
     end
 
-    # Remove 976$a and move $b to $a
+    # Remove 976$a and move $b to $a if $b exists
     def self.rule_976(record)
       record = clone(record)
       record.fields('976').each do |field|
         subfield_a = field.subfields.find { |sf| sf.code == 'a' }
-        if subfield_a
+        subfield_b = field.subfields.find { |sf| sf.code == 'b' }
+        if subfield_a && subfield_b
           field.remove(subfield_a)
           field.append(MARC::Subfield.new('a', field['b']))
           field.remove('b')
