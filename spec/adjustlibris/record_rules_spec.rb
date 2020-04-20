@@ -951,6 +951,18 @@ describe "AdjustLibris::RecordRules" do
       end
     end
 
+    context "rule_852_required" do
+      before :each do
+        @record_without_852 = MARC::Reader.new("spec/data/rule_852_required.mrc").first
+      end
+
+      it "should raise exception on record with 003 as LIBRIS and 852 is missing" do
+        expect {
+          AdjustLibris::RecordRules.rule_852_required(@record_without_852)
+        }.to raise_error(NonLibraryAffiliatedRecord)
+      end
+    end
+    
     context "rule_866" do
       private def change_field(record, from_tag, to_tag)
         record.fields(from_tag).each do |field|
