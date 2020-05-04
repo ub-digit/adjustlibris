@@ -40,6 +40,7 @@ class AdjustLibris
       record = rule_780(record)
       record = rule_785(record)
       record = rule_787(record)
+      record = rule_852_required(record)
       record = rule_852(record)
       record = rule_866(record)
       record = rule_976(record)
@@ -446,6 +447,17 @@ class AdjustLibris
       record
     end
 
+    # Require 852 to be present if 003 is LIBRIS. Otherwise raise NonLibraryAffiliatedRecord
+    def self.rule_852_required(record)
+      record = clone(record)
+      f003 = record["003"].value
+      f852_count = record.fields('852').size
+      if f003 == "LIBRIS" && f852_count == 0
+        raise NonLibraryAffiliatedRecord
+      end
+      record
+    end
+    
     # Remove all 852 without \c in $8 if any 852$8 contains \c
     def self.rule_852(record)
       record = clone(record)
