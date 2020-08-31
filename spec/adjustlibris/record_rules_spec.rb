@@ -77,6 +77,8 @@ describe "AdjustLibris::RecordRules" do
       before :each do
         @record_035_with_sub9_8chars = MARC::Reader.new("spec/data/rule_035-with_sub9_8chars.mrc").first
         @record_035_with_sub9_not_8chars = MARC::Reader.new("spec/data/rule_035-with_sub9_not_8chars.mrc").first
+        @record_035_with_suba_8chars = MARC::Reader.new("spec/data/rule_035-with_suba_8chars.mrc").first
+        @record_035_with_suba_not_8chars = MARC::Reader.new("spec/data/rule_035-with_suba_not_8chars.mrc").first
         @record_035_with_sub5 = MARC::Reader.new("spec/data/rule_035-with_sub5.mrc").first
       end
 
@@ -85,9 +87,19 @@ describe "AdjustLibris::RecordRules" do
         expect(new_record['035']['9']).to eq("1111-2345")
       end
       
+      it "should insert a dash in 035$a if length is exactly 8 (issn)" do
+        new_record = AdjustLibris::RecordRules.rule_035_a_issn(@record_035_with_suba_8chars)
+        expect(new_record['035']['a']).to eq("1111-2345")
+      end
+      
       it "should not insert a dash in 035$9 if length is other than 8 (issn)" do
         new_record = AdjustLibris::RecordRules.rule_035_9(@record_035_with_sub9_not_8chars)
         expect(new_record['035']['9']).to eq("991234567")
+      end
+      
+      it "should not insert a dash in 035$a if length is other than 8 (issn)" do
+        new_record = AdjustLibris::RecordRules.rule_035_a_issn(@record_035_with_suba_not_8chars)
+        expect(new_record['035']['a']).to eq("991234567")
       end
       
       it "should move 035$9 to 035$a" do

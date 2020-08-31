@@ -8,6 +8,7 @@ class AdjustLibris
       record = rule_020(record)
       record = rule_030(record)
       record = rule_035_9(record)
+      record = rule_035_a_issn(record)
       record = rule_035_9_to_a(record)
       record = rule_035_5(record)
       record = rule_082(record)
@@ -121,6 +122,19 @@ class AdjustLibris
         if field['9'].size == 8
           subfield = field.subfields.find_all { |sf| sf.code == '9' }.first
           subfield.value = field['9'][0..3] + '-' + field['9'][4..7]
+        end
+      end
+      record
+    end
+
+    # If 035$a contains exactly 8 characters, insert a dash in the middle.
+    def self.rule_035_a_issn(record)
+      record = clone(record)
+      record.fields('035').each do |field|
+        next if !field['a']
+        if field['a'].size == 8
+          subfield = field.subfields.find_all { |sf| sf.code == 'a' }.first
+          subfield.value = field['a'][0..3] + '-' + field['a'][4..7]
         end
       end
       record
